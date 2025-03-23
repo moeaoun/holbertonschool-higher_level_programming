@@ -1,17 +1,11 @@
-#!/usr/bin/python3
-
-def islower(c):
-    # Check if the character is lowercase by its ASCII value
-    return ord('a') <= ord(c) <= ord('z')
-
 def uppercase(str):
-    result = ""
-    for c in str:
-        if islower(c):
-            result += chr(ord(c) - 32)  # Convert lowercase to uppercase
+    for char in str:
+        # Check if the character is a lowercase letter
+        if 'a' <= char <= 'z':
+            # Convert to uppercase by changing the ASCII value
+            print(chr(ord(char) - 32), end="")
         else:
-            result += c  # Keep non-lowercase characters unchanged
-    
-    # Print the final result
-    print(result)
+            # Just print the character as is
+            print(char, end="")
+    print()  # Print the newline at the end
 
