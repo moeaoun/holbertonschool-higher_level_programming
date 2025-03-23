@@ -5,6 +5,6 @@ def uppercase(str):
         if ord('a') <= ord(c) <= ord('z'):
             result += chr(ord(c) - 32)  # Convert to uppercase
         else:
-            result += c  # Keep non-lowercase characters as is
-    print("".join(result))  # Only one print function used here
+            result += c  # Leave other characters unchanged
+    print(result)  # Only one print function used here
 
