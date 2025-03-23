@@ -11,5 +11,4 @@ def fizzbuzz():
         else:
             print(i, end=" ")
     print()  # Print a newline at the end
-                                               
-~                                                      
+        
