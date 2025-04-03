@@ -54,7 +54,6 @@ class Rectangle:
         return "\n".join(["#" * self.__width] * self.__height)
 
     def __repr__(self):
-        """Returns a formal string representation of the rectangle."""
-        return f"<{self.__class__.__name__}({self.__width}, {self.__height})>"
-
+        """Returns a formal string representation of the rectangle with memory address."""
+        return f"<{self.__class__.__module__}.{self.__class__.__name__} object at {hex(id(self))}>"
 
