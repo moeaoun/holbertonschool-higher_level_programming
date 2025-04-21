@@ -30,16 +30,14 @@ class SimpleAPIHandler(BaseHTTPRequestHandler):
             self.send_response(404)
             self.send_header("Content-Type", "application/json")
             self.end_headers()
-            error = {"error": "Endpoint not found"}
-            # Ensure compact JSON format (no extra spaces) to match strict test
-            self.wfile.write(json.dumps(error, separators=(",", ":")).encode("utf-8"))
+            # EXPLICITLY FORMAT THE JSON EXACTLY AS EXPECTED
+            self.wfile.write(b'{"error":"Endpoint not found"}')
 
 
 def run(server_class=HTTPServer, handler_class=SimpleAPIHandler, port=8000):
     """Start HTTP server on the specified port."""
     server_address = ("", port)
     httpd = server_class(server_address, handler_class)
-    print(f"Starting server on port {port}...")
     httpd.serve_forever()
 
 
