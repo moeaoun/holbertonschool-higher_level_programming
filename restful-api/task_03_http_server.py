@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Simple API using http.server module."""
+"""Simple API using http.server module"""
 
 from http.server import BaseHTTPRequestHandler, HTTPServer
 import json
@@ -17,8 +17,12 @@ class SimpleAPIHandler(BaseHTTPRequestHandler):
             self.send_response(200)
             self.send_header("Content-Type", "application/json")
             self.end_headers()
-            data = {"name": "John", "age": 30, "city": "New York"}
-            self.wfile.write(json.dumps(data).encode("utf-8"))
+            data = {
+                "name": "John",
+                "age": 30,
+                "city": "New York"
+            }
+            self.wfile.write(json.dumps(data).encode())
 
         elif self.path == "/status":
             self.send_response(200)
@@ -26,18 +30,30 @@ class SimpleAPIHandler(BaseHTTPRequestHandler):
             self.end_headers()
             self.wfile.write(b"OK")
 
+        elif self.path == "/info":
+            self.send_response(200)
+            self.send_header("Content-Type", "application/json")
+            self.end_headers()
+            info = {
+                "version": "1.0",
+                "description": "A simple API built with http.server"
+            }
+            self.wfile.write(json.dumps(info).encode())
+
         else:
             self.send_response(404)
             self.send_header("Content-Type", "application/json")
             self.end_headers()
-            # EXPLICITLY FORMAT THE JSON EXACTLY AS EXPECTED
-            self.wfile.write(b'{"error":"Endpoint not found"}')
+            error = {
+                "error": "Endpoint not found"
+            }
+            self.wfile.write(json.dumps(error).encode())
 
 
 def run(server_class=HTTPServer, handler_class=SimpleAPIHandler, port=8000):
-    """Start HTTP server on the specified port."""
     server_address = ("", port)
     httpd = server_class(server_address, handler_class)
+    print(f"Starting http.server on port {port}...")
     httpd.serve_forever()
 
 
