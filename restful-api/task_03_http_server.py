@@ -41,11 +41,12 @@ class SimpleAPIHandler(BaseHTTPRequestHandler):
             self.wfile.write(json.dumps(info).encode())
 
         else:
+            # Ensure the response for undefined endpoints is structured correctly
             self.send_response(404)
             self.send_header("Content-Type", "application/json")
             self.end_headers()
             error = {
-                "error": "Endpoint not found"
+                "error": "Not Found"
             }
             self.wfile.write(json.dumps(error).encode())
 
