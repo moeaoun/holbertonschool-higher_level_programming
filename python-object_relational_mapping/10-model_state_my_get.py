@@ -1,29 +1,33 @@
 #!/usr/bin/python3
-"""
-Script that prints the State object with the name passed as argument
-from the database
-Using module SQLAlchemy
-"""
+"""Prints the State object with the name passed as argument from the database."""
 
-from model_state import Base, State
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from sys import argv
+from model_state import Base, State
+import sys
 
 if __name__ == "__main__":
-    # create an engine
-    engine = create_engine('mysql+mysqldb://{}:{}@localhost/{}'.format(
-        argv[1], argv[2], argv[3]), pool_pre_ping=True)
-    # create a configured "Session" class
+    # Parse command-line arguments
+    username, password, db_name, state_name = sys.argv[1:5]
+
+    # Create SQLAlchemy engine
+    engine = create_engine(
+        f'mysql+mysqldb://{username}:{password}@localhost:3306/{db_name}',
+        pool_pre_ping=True
+    )
+
+    # Bind the engine to a session
     Session = sessionmaker(bind=engine)
-    # create a Session
     session = Session()
-    Base.metadata.create_all(engine)
 
-    s_tate = session.query(State).filter(State.name == argv[4]).first()
+    # Query the database for the state using parameter binding (SQL injection safe)
+    result = session.query(State).filter(State.name == state_name).first()
 
-    if s_tate:
-        print("{}".format(s_tate.id))
+    # Output result
+    if result:
+        print(result.id)
     else:
         print("Not found")
+
     session.close()
+
