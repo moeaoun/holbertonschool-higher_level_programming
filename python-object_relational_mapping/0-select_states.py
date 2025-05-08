@@ -1,33 +1,23 @@
 #!/usr/bin/python3
-"""
-Lists all states from the database hbtn_0e_0_usa
-Usage: ./0-select_states.py <mysql_username> <mysql_password> <database_name>
-"""
-
+""" Script that lists all states from the database hbtn_0e_0_usa """
 import MySQLdb
-import sys
+from sys import argv
 
-if __name__ == "__main__":
-    # Get arguments from command line
-    username = sys.argv[1]
-    password = sys.argv[2]
-    db_name = sys.argv[3]
+# The code should not be executed when imported
+if __name__ == '__main__':
 
-    # Connect to MySQL database
-    db = MySQLdb.connect(host="localhost", port=3306,
-                         user=username, passwd=password, db=db_name)
+    # make a connection to the database
+    db = MySQLdb.connect(host="localhost", port=3306, user=argv[1],
+                         passwd=argv[2], db=argv[3])
 
-    # Create a cursor to execute queries
+    # It gives us the ability to have multiple seperate working environments
+    # through the same connection to the database.
     cur = db.cursor()
+    cur.execute("SELECT * FROM states")
 
-    # Execute the query
-    cur.execute("SELECT * FROM states ORDER BY id ASC")
-
-    # Fetch and print all rows
-    for row in cur.fetchall():
-        print(row)
-
-    # Close the cursor and connection
+    rows = cur.fetchall()
+    for i in rows:
+        print(i)
+    # Clean up process
     cur.close()
     db.close()
-
