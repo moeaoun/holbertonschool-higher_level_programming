@@ -20,7 +20,7 @@ if __name__ == "__main__":
     # Create cursor
     cur = db.cursor()
 
-    # SQL query to get cities and their corresponding states
+    # Execute SQL query to join cities and states, sorted by cities.id
     query = """
         SELECT cities.id, cities.name, states.name
         FROM cities
@@ -29,10 +29,11 @@ if __name__ == "__main__":
     """
     cur.execute(query)
 
-    # Print each result
+    # Print all rows in the format (id, city_name, state_name)
     for row in cur.fetchall():
         print(row)
 
     # Close cursor and connection
     cur.close()
     db.close()
+
