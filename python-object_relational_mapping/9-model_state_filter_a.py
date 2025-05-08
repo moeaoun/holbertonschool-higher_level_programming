@@ -1,26 +1,32 @@
 #!/usr/bin/python3
-from model_state import Base, State
+"""Lists all State objects that contain the letter 'a' from the database."""
+
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+from model_state import Base, State
 import sys
 
 if __name__ == "__main__":
-    # Get arguments from command line
-    mysql_user = sys.argv[1]
-    mysql_password = sys.argv[2]
-    mysql_db = sys.argv[3]
+    # Command line arguments
+    username, password, db_name = sys.argv[1:4]
 
-    # Create engine to connect to the MySQL server
-    engine = create_engine(f'mysql+mysqldb://{mysql_user}:{mysql_password}@localhost/{mysql_db}')
+    # Create engine
+    engine = create_engine(
+        f'mysql+mysqldb://{username}:{password}@localhost:3306/{db_name}',
+        pool_pre_ping=True
+    )
 
-    # Create a session to interact with the database
+    # Create a configured "Session" class and a session
     Session = sessionmaker(bind=engine)
     session = Session()
 
-    # Query all states containing 'a' in their name, sorted by states.id
+    # Query: states with letter 'a' in their name
     states = session.query(State).filter(State.name.like('%a%')).order_by(State.id).all()
 
     # Print results
     for state in states:
         print(f"{state.id}: {state.name}")
+
+    # Close session
+    session.close()
 
