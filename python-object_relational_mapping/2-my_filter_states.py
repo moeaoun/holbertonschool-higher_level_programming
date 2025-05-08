@@ -1,7 +1,8 @@
 #!/usr/bin/python3
 """
-Displays all values in the states table where name matches the user input.
-Usage: ./2-my_filter_states.py <mysql_username> <mysql_password> <database_name> <state_name>
+Displays all values in the states table where name matches the argument.
+Usage: ./2-my_filter_states.py <mysql_username> <mysql_password>
+        <database_name> <state_name>
 """
 
 import MySQLdb
@@ -21,15 +22,14 @@ if __name__ == "__main__":
     # Create a cursor object to execute SQL queries
     cur = db.cursor()
 
-    # Construct the query using string formatting (prone to SQL injection)
-    query = "SELECT * FROM states WHERE name LIKE BINARY '{}' ORDER BY id ASC".format(state_name)
+    # Create the query with the user input using string formatting
+    query = "SELECT * FROM states WHERE name = '{}' ORDER BY id ASC".format(state_name)
     cur.execute(query)
 
-    # Fetch and print all matching rows
+    # Fetch and print matching rows
     for row in cur.fetchall():
         print(row)
 
-    # Close the cursor and the database connection
+    # Close the cursor and database connection
     cur.close()
     db.close()
-
