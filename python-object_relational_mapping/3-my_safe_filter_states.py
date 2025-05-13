@@ -1,27 +1,21 @@
 #!/usr/bin/python3
-"""
-Script that takes in an argument and displays all values
-in the states table of hbtn_0e_0_usa where name matches the argument
-but safe from MySQL injections!
-"""
-import MySQLdb
-from sys import argv
+"""0x0F. Python - Object-relational mapping - task 4. Cities by states"""
 
-# The code should not be executed when imported
 if __name__ == '__main__':
+    import sys
+    import MySQLdb
 
-    # make a connection to the database
-    db = MySQLdb.connect(host="localhost", port=3306, user=argv[1],
-                         passwd=argv[2], db=argv[3])
+    if len(sys.argv) != 5:
+        sys.exit('Use: 1-filter_states.py <mysql username> <mysql password>'
+                 ' <database name> <state name searched>')
 
-    # It gives us the ability to have multiple seperate working environments
-    # through the same connection to the database.
-    cur = db.cursor()
-    cur.execute("SELECT * FROM states WHERE BINARY name = %s", [argv[4]])
-
-    rows = cur.fetchall()
-    for i in rows:
-        print(i)
-    # Clean up process
+    conn = MySQLdb.connect(host='localhost', port=3306, user=sys.argv[1],
+                           passwd=sys.argv[2], db=sys.argv[3], charset='utf8')
+    cur = conn.cursor()
+    cur.execute("SELECT * FROM states WHERE name LIKE BINARY %s "
+                "ORDER BY id ASC", (sys.argv[4], ))
+    query_rows = cur.fetchall()
+    for row in query_rows:
+        print(row)
     cur.close()
-    db.close()
+    conn.close()

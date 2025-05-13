@@ -1,20 +1,23 @@
 #!/usr/bin/python3
-from sqlalchemy import Column, Integer, String, text
-from sqlalchemy.orm import relationship
+"""0x0F. Python - Object-relational mapping - task 15. City relationship
+"""
+from sqlalchemy import Column, Integer, String
 from sqlalchemy.ext.declarative import declarative_base
-"""
-    Module that performs creates a States class based off of Base.
-"""
+from sqlalchemy.orm import relationship
 
 Base = declarative_base()
 
 
 class State(Base):
-    """
-        The ``States`` class which inherits from ``Base`` class.
+    """Defines ORM class for table `states`, with 2 columns:
+
+       `id` (Column): unique identifier, primary key
+       `name` (Column): name of state
+       `cities` (relationship): one-to-many-association to `City`
     """
     __tablename__ = 'states'
-    id = Column(Integer, primary_key=True)
+    id = Column(Integer, autoincrement=True, unique=True,
+                nullable=False, primary_key=True)
     name = Column(String(128), nullable=False)
-
-    cities = relationship("City", backref="state", cascade="all, delete")
+    cities = relationship("City", cascade="all, delete-orphan",
+                          backref="state")

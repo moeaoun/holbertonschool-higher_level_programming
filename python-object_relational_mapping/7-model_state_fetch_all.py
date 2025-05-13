@@ -1,33 +1,23 @@
 #!/usr/bin/python3
+"""0x0F. Python - Object-relational mapping - task 7. All states via SQLAlchemy
 """
-Lists all State objects from the database hbtn_0e_6_usa using SQLAlchemy.
-"""
 
-import sys
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
-from model_state import Base, State
+if __name__ == '__main__':
+    from sys import argv
+    from sqlalchemy import create_engine
+    from sqlalchemy.orm import Session
+    from model_state import Base, State
 
-if __name__ == "__main__":
-    # Get the arguments
-    username = sys.argv[1]
-    password = sys.argv[2]
-    db_name = sys.argv[3]
+    if len(argv) != 4:
+        sys.exit('Use: 7-model_state_fetch_all.py <mysql username> '
+                 '<mysql password> <database name>')
 
-    # Create an engine and connect to the MySQL database
-    engine = create_engine(f'mysql+mysqldb://{username}:{password}@localhost/{db_name}')
+    engine = create_engine('mysql+mysqldb://{}:{}@localhost:3306/'
+                           '{}'.format(argv[1], argv[2], argv[3]),
+                           pool_pre_ping=True)
+    Base.metadata.create_all(engine)
 
-    # Create a session
-    Session = sessionmaker(bind=engine)
-    session = Session()
-
-    # Query all states from the states table, ordered by id
-    states = session.query(State).order_by(State.id).all()
-
-    # Print all states
-    for state in states:
-        print(f"{state.id}: {state.name}")
-
-    # Close the session
+    session = Session(engine)
+    for state in session.query(State).order_by(State.id).all():
+        print("{}: {}".format(state.id, state.name))
     session.close()
-

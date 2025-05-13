@@ -1,27 +1,25 @@
 #!/usr/bin/python3
-"""
-Script that deletes all State objects with a name containing
-the letter a from the database
-Using module SQLAlchemy
+"""0x0F. Python - Object-relational mapping - task 13. Delete states
 """
 
-from model_state import Base, State
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
-from sys import argv
+if __name__ == '__main__':
+    from sys import argv, exit
+    from sqlalchemy import create_engine
+    from sqlalchemy.orm import Session
+    from model_state import Base, State
 
-if __name__ == "__main__":
-    # create an engine
-    engine = create_engine('mysql+mysqldb://{}:{}@localhost/{}'.format(
-        argv[1], argv[2], argv[3]), pool_pre_ping=True)
-    # create a configured "Session" class
-    Session = sessionmaker(bind=engine)
-    # create a Session
-    session = Session()
-    Base.metadata.create_all(engine)
-    state_del = session.query(State).filter(State.name.like('%a%')).all()
-    for delete in state_del:
-        session.delete(delete)
-    # commit and close session
+    if len(argv) != 4:
+        exit('Use: 13-model_state_delete_a.py <mysql username> '
+             '<mysql password> <database name> ')
+
+    engine = create_engine('mysql+mysqldb://{}:{}@localhost:3306/'
+                           '{}'.format(argv[1], argv[2], argv[3]),
+                           pool_pre_ping=True)
+    session = Session(engine)
+    Base.metadata.create_all(engine)  # creates decprecated warning 1681
+
+    a_states = session.query(State).filter(State.name.like('%a%')).all()
+    for state in a_states:
+        session.delete(state)
     session.commit()
     session.close()

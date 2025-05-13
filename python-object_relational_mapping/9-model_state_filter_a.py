@@ -1,32 +1,25 @@
 #!/usr/bin/python3
-"""Lists all State objects that contain the letter 'a' from the database."""
+"""0x0F. Python - Object-relational mapping - task 9. Contains `a`
+"""
 
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
-from model_state import Base, State
-import sys
+if __name__ == '__main__':
+    from sys import argv
+    from sqlalchemy import create_engine
+    from sqlalchemy.orm import Session
+    from model_state import Base, State
 
-if __name__ == "__main__":
-    # Command line arguments
-    username, password, db_name = sys.argv[1:4]
+    if len(argv) != 4:
+        sys.exit('Use: 9-model_state_filter_a.py <mysql username> '
+                 '<mysql password> <database name>')
 
-    # Create engine
-    engine = create_engine(
-        f'mysql+mysqldb://{username}:{password}@localhost:3306/{db_name}',
-        pool_pre_ping=True
-    )
+    engine = create_engine('mysql+mysqldb://{}:{}@localhost:3306/'
+                           '{}'.format(argv[1], argv[2], argv[3]),
+                           pool_pre_ping=True)
+    Base.metadata.create_all(engine)
 
-    # Create a configured "Session" class and a session
-    Session = sessionmaker(bind=engine)
-    session = Session()
-
-    # Query: states with letter 'a' in their name
-    states = session.query(State).filter(State.name.like('%a%')).order_by(State.id).all()
-
-    # Print results
+    session = Session(engine)
+    states = session.query(State).order_by(State.id)
+    states = states.filter(State.name.like('%a%')).all()
     for state in states:
-        print(f"{state.id}: {state.name}")
-
-    # Close session
+        print("{}: {}".format(state.id, state.name))
     session.close()
-

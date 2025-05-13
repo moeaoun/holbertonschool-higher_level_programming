@@ -1,39 +1,22 @@
 #!/usr/bin/python3
-"""
-Lists all cities from the database hbtn_0e_4_usa with their state names.
-Usage: ./4-cities_by_state.py <mysql_username> <mysql_password> <database_name>
-"""
+"""0x0F. Python - Object-relational mapping - task 4. Cities by states"""
 
-import MySQLdb
-import sys
+if __name__ == '__main__':
+    import sys
+    import MySQLdb
 
-if __name__ == "__main__":
-    # Command-line arguments
-    username = sys.argv[1]
-    password = sys.argv[2]
-    db_name = sys.argv[3]
+    if len(sys.argv) != 4:
+        print('Use: 0-select_states.py <mysql username> <mysql password>'
+              ' <database name>')
+        sys.exit()
 
-    # Connect to MySQL database
-    db = MySQLdb.connect(host="localhost", port=3306,
-                         user=username, passwd=password, db=db_name)
-
-    # Create cursor
-    cur = db.cursor()
-
-    # Execute SQL query to join cities and states, sorted by cities.id
-    query = """
-        SELECT cities.id, cities.name, states.name
-        FROM cities
-        JOIN states ON cities.state_id = states.id
-        ORDER BY cities.id ASC
-    """
-    cur.execute(query)
-
-    # Print all rows in the format (id, city_name, state_name)
-    for row in cur.fetchall():
+    conn = MySQLdb.connect(host='localhost', port=3306, user=sys.argv[1],
+                           passwd=sys.argv[2], db=sys.argv[3], charset='utf8')
+    cur = conn.cursor()
+    cur.execute('SELECT cities.id, cities.name, states.name FROM cities '
+                'LEFT JOIN states ON cities.state_id = states.id;')
+    query_rows = cur.fetchall()
+    for row in query_rows:
         print(row)
-
-    # Close cursor and connection
     cur.close()
-    db.close()
-
+    conn.close()
