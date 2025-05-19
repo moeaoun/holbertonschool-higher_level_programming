@@ -1,5 +1,5 @@
-# create_db.py
 import sqlite3
+
 
 def create_database():
     conn = sqlite3.connect('products.db')
@@ -12,17 +12,15 @@ def create_database():
             price REAL NOT NULL
         )
     ''')
-    cursor.execute('DELETE FROM Products')  # Clear duplicates on rerun
-    cursor.executemany('''
+    cursor.execute('''
         INSERT INTO Products (id, name, category, price)
-        VALUES (?, ?, ?, ?)
-    ''', [
+        VALUES
         (1, 'Laptop', 'Electronics', 799.99),
         (2, 'Coffee Mug', 'Home Goods', 15.99)
-    ])
+    ''')
     conn.commit()
     conn.close()
 
+
 if __name__ == '__main__':
     create_database()
-
