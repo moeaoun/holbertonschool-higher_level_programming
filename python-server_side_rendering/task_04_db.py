@@ -2,67 +2,90 @@ from flask import Flask, render_template, request
 import json
 import csv
 import sqlite3
+import os
 
 app = Flask(__name__)
 
-# Helper: Load from JSON
+# ---------- JSON Source ----------
 def load_json_data():
     try:
-        with open("products.json", "r") as f:
-            return json.load(f)
+        with open('products.json', 'r') as file:
+            return json.load(file)
     except Exception as e:
-        return []
+        return f"Error loading JSON data: {e}"
 
-# Helper: Load from CSV
+# ---------- CSV Source ----------
 def load_csv_data():
-    products = []
     try:
-        with open("products.csv", newline="") as f:
-            reader = csv.DictReader(f)
+        products = []
+        with open('products.csv', 'r') as file:
+            reader = csv.DictReader(file)
             for row in reader:
-                products.append({
-                    'id': int(row['id']),
-                    'name': row['name'],
-                    'category': row['category'],
-                    'price': float(row['price'])
-                })
+                row['id'] = int(row['id'])
+                row['price'] = float(row['price'])
+                products.append(row)
         return products
     except Exception as e:
-        return []
+        return f"Error loading CSV data: {e}"
 
-# Helper: Load from SQLite
+# ---------- SQL Source ----------
 def load_sql_data():
+    if not os.path.exists('products.db'):
+        return "Database file not found."
+
     try:
         conn = sqlite3.connect('products.db')
         cursor = conn.cursor()
-        cursor.execute('SELECT id, name, category, price FROM Products')
+        cursor.execute("SELECT id, name, category, price FROM Products")
         rows = cursor.fetchall()
-        products = [
-            {'id': row[0], 'name': row[1], 'category': row[2], 'price': row[3]}
-            for row in rows
-        ]
         conn.close()
+        products = []
+        for row in rows:
+            products.append({
+                'id': row[0],
+                'name': row[1],
+                'category': row[2],
+                'price': row[3]
+            })
         return products
-    except sqlite3.Error as e:
+    except Exception as e:
         return f"Database error: {e}"
 
+# ---------- Flask Route ----------
 @app.route('/')
 def display_products():
     source = request.args.get('source', 'json')
+    filter_id = request.args.get('id')
     error = None
+    products = []
 
+    # Load data based on source
     if source == 'json':
-        products = load_json_data()
+        result = load_json_data()
     elif source == 'csv':
-        products = load_csv_data()
+        result = load_csv_data()
     elif source == 'sql':
         result = load_sql_data()
-        if isinstance(result, str):  # error message
-            return render_template('product_display.html', error=result)
-        products = result
     else:
         error = "Wrong source"
-        products = []
+        result = []
+
+    # Handle errors in data loading
+    if isinstance(result, str):
+        error = result
+    else:
+        products = result
+
+    # Optional: Filter by ID
+    if filter_id and products:
+        try:
+            filter_id = int(filter_id)
+            products = [p for p in products if p['id'] == filter_id]
+            if not products:
+                error = f"No product found with id {filter_id}"
+        except ValueError:
+            error = "Invalid ID format"
+            products = []
 
     return render_template('product_display.html', products=products, error=error)
 
